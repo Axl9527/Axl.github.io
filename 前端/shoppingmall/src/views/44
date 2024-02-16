@@ -1,0 +1,141 @@
+<div class="shoppingCart">
+      <!-- 购物车头部 -->
+      <div class="cart-header">
+        <div class="cart-header-content">
+          <p>
+            <i class="el-icon-shopping-cart-full" style="color:#ff6700; font-weight: 600;"></i>
+            我的购物车
+          </p>
+          <span>温馨提示：产品是否购买成功，以最终下单为准哦，请尽快结算</span>
+        </div>
+      </div>
+      <!-- 购物车头部END -->
+  
+      <!-- 购物车主要内容区 -->
+      <div class="content" v-if="getShoppingCart.length>0">
+        <ul>
+          <!-- 购物车表头 -->
+          <li class="header">
+            <div class="pro-check">
+              <el-checkbox v-model="isAllCheck">全选</el-checkbox>
+            </div>
+            <div class="pro-img"></div>
+            <div class="pro-name">商品名称</div>
+            <div class="pro-price">单价</div>
+            <div class="pro-num">数量</div>
+            <div class="pro-total">小计</div>
+            <div class="pro-action">操作</div>
+          </li>
+          <!-- 购物车表头END -->
+  
+          <!-- 购物车列表 -->
+          <li class="product-list" v-for="(item,index) in getShoppingCart" :key="item.id">
+            <div class="pro-check">
+              <el-checkbox :value="item.check" @change="checkChange($event,index)"></el-checkbox>
+            </div>
+            <div class="pro-img">
+              <router-link :to="{ path: '/goods/details', query: {productID:item.productID} }">
+                <img :src="$target + item.productImg" />
+              </router-link>
+            </div>
+            <div class="pro-name">
+              <router-link
+                :to="{ path: '/goods/details', query: {productID:item.productID} }"
+              >{{item.productName}}</router-link>
+            </div>
+            <div class="pro-price">{{item.price}}元</div>
+            <div class="pro-num">
+              <el-input-number
+                size="small"
+                :value="item.num"
+                @change="handleChange($event,index,item.productID)"
+                :min="1"
+                :max="item.maxNum"
+              ></el-input-number>
+            </div>
+            <div class="pro-total pro-total-in">{{item.price*item.num}}元</div>
+            <div class="pro-action">
+              <el-popover placement="right">
+                <p>确定删除吗？</p>
+                <div style="text-align: right; margin: 10px 0 0">
+                  <el-button
+                    type="primary"
+                    size="mini"
+                    @click="deleteItem($event,item.id,item.productID)"
+                  >确定</el-button>
+                </div>
+                <i class="el-icon-error" slot="reference" style="font-size: 18px;"></i>
+              </el-popover>
+            </div>
+          </li>
+          <!-- 购物车列表END -->
+        </ul>
+        <div style="height:20px;background-color: #f5f5f5"></div>
+        <!-- 购物车底部导航条 -->
+        <div class="cart-bar">
+          <div class="cart-bar-left">
+            <span>
+              <router-link to="/goods">继续购物</router-link>
+            </span>
+            <span class="sep">|</span>
+            <span class="cart-total">
+              共
+              <span class="cart-total-num">{{getNum}}</span> 件商品，已选择
+              <span class="cart-total-num">{{getCheckNum}}</span> 件
+            </span>
+          </div>
+          <div class="cart-bar-right">
+            <span>
+              <span class="total-price-title">合计：</span>
+              <span class="total-price">{{getTotalPrice}}元</span>
+            </span>
+            <router-link :to="getCheckNum > 0 ? '/confirmOrder' : ''">
+              <div :class="getCheckNum > 0 ? 'btn-primary' : 'btn-primary-disabled'">去结算</div>
+            </router-link>
+          </div>
+        </div>
+        <!-- 购物车底部导航条END -->
+      </div>
+      <!-- 购物车主要内容区END -->
+  
+      <!-- 购物车为空的时候显示的内容 -->
+      <div v-else class="cart-empty">
+        <div class="empty">
+          <h2>您的购物车还是空的！</h2>
+          <p>快去购物吧！</p>
+        </div>
+      </div>
+      <!-- 购物车为空的时候显示的内容END -->
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="myLogin">
+    <el-dialog title="登录" width="300px" center :visible.sync="isLogin">
+      <el-form :model="LoginUser" :rules="rules" status-icon ref="ruleForm" class="demo-ruleForm">
+        <el-form-item prop="name">
+          <el-input prefix-icon="el-icon-user-solid" placeholder="请输入账号" v-model="LoginUser.uname"></el-input>
+        </el-form-item>
+        <el-form-item prop="pass">
+          <el-input
+            prefix-icon="el-icon-view"
+            type="password"
+            placeholder="请输入密码"
+            v-model="LoginUser.upassword"
+          ></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button size="medium" type="primary" @click="Login" style="width:100%;">登录</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+  </div>
