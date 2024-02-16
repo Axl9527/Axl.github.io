@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 对应接口的全名 -->
+<mapper namespace="com.easy.dao.IDetailsDao">
+
+<insert id="add" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+
+insert into detail (orderid,goodsid,count,price,userid)values(#{orderid},#{goodsid},#{count},#{price},#{userid})
+</insert>
+
+<select id="list" resultMap="listMap">
+select * from detail where orderid=#{orderid}
+
+</select>
+
+<select id="goodlist" resultType="com.easy.bean.Goods">
+
+select * from goods where id=#{goodsid}
+</select>
+
+<resultMap type="com.easy.bean.Detail" id="listMap">
+<result property="goodsid" column="goodsid"/>
+
+<association property="good" column="goodsid" select="goodlist"></association>
+
+</resultMap>
+<!-- 
+<select id="detailList" resultMap="detailMap">
+
+
+</select> -->
+<delete id="delDetail">
+
+ delete detail from where orderid=#{orderid} and goodsid=#{goodsid}
+</delete>
+
+</mapper>

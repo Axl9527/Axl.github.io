@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 对应接口的全名 -->
+<mapper namespace="com.easy.dao.ICollectionDao">
+
+<insert id="addCollection">
+
+insert into collection (gid,uid,jointime) values (#{gid},#{uid},now())
+</insert>
+
+<!-- 查看是否有重复 -->
+<select id="chongfu" resultType="int">
+
+select count(*) from collection where gid=#{gid} and uid=#{uid}
+
+</select>
+
+<!-- 查看喜欢商品 -->
+<select id="list" resultMap="collectionList">
+
+select * from collection where uid=#{uid} 
+
+</select>
+<select id="goodList" resultType="com.easy.bean.Goods">
+
+select * from goods where id=#{gid}
+
+</select>
+<resultMap type="com.easy.bean.Collection1" id="collectionList">
+<result property="gid" column="gid"/>
+
+<association property="good" column="gid" select="goodList"></association>
+
+</resultMap>
+</mapper>

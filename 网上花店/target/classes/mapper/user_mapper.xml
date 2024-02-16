@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 对应接口的全名 -->
+<mapper namespace="com.easy.dao.IUserDao">
+<sql id="WhereSQL">
+<where>
+del=0 
+<if test="user.uname!=null and user.uname!=''">
+	<bind name="names" value="'%'+user.uname+'%'"/>
+	and uname like #{names}
+	</if>
+	
+</where>
+</sql>
+
+
+<select id="userList" resultType="com.easy.bean.User">
+select * from user
+	<!-- 查询条件 -->
+	<include refid="WhereSQL"></include>
+	<!-- 分页的数据 -->
+	<if test="page.size !=null and page.page !=null">
+		limit #{page.start},#{page.size}
+	</if>
+</select>
+
+
+<select id="userCount" resultType="int">
+	select count(*) from user
+	<!-- 查询条件 -->
+	<include refid="WhereSQL"></include>
+</select>
+
+
+<select id="editMiMaByName" resultType="com.easy.bean.User">
+
+select * from user where uname=#{uname}
+
+</select>
+
+
+
+
+
+
+
+
+
+<select id="userListL" resultType="com.easy.bean.User">
+select * from user where del=0 and ustate=1
+</select>
+
+<select id="cha" resultType="com.easy.bean.User">
+select * from user where uname =#{user.uname}
+</select>
+
+<update id="updateUser">
+
+update user 
+ 
+<set> 
+<if test="ustate!=null and ustate !=''">
+ustate=#{ustate},
+</if>
+<if test="uname!=null and uname !=''">
+uname=#{uname},
+</if>
+
+<if test="usex!=null and usex !=''">
+usex=#{usex},
+</if>
+<if test="email!=null and email !=''">
+email=#{email},
+</if>
+
+<if test="uphone!=null and uphone != ''">
+uphone =#{uphone},
+</if>
+<if test="upassword!=null and upassword !=''">
+upassword=#{upassword},
+</if>
+
+<if test="img !=null and img !=''">
+img=#{img}
+</if>
+</set>
+where uid=#{uid} 
+</update>
+
+<insert id="addUser" >
+insert into user (uname,upassword,email,uphone,img) values (#{uname},#{upassword},#{email},#{uphone},#{img})
+
+</insert>
+<!-- 查看是否有重复用户名称 -->
+<select id="chongfu" resultType="int">
+
+select count(*) from user where  uname=#{uname}
+
+</select>
+
+
+
+
+</mapper>

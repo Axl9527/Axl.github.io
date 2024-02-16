@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 对应接口的全名 -->
+<mapper namespace="com.easy.dao.IGoodsDao">
+<sql id="WhereSQL">
+<where>
+	del=0 and state=0
+<if test="goods.name != null and goods.name != ''">
+<bind name="namelike" value="'%'+goods.name+'%'"/>
+    and name like #{namelike}
+</if>
+<if test="goods.pid !=null and goods.pid != ''">
+	and pid=#{goods.pid}
+</if>
+</where>
+</sql>
+<sql id="WhereSQLHou">
+<where>
+	del=0 
+<if test="goods.name != null and goods.name != ''">
+<bind name="namelike" value="'%'+goods.name+'%'"/>
+    and name like #{namelike}
+</if>
+<if test="goods.pid !=null and goods.pid != ''">
+	and pid=#{goods.pid}
+</if>
+</where>
+</sql>
+<!-- 查询数据 -->
+<select id="list" resultMap="listMap">
+	select * from goods
+<!-- 查询条件 -->
+<include refid="WhereSQL"></include>
+<!-- 分页的数据 -->
+<if test="page.size !=null and page.page  !=null">
+	limit #{page.start},#{page.size}
+</if>
+</select>
+ 
+ <!-- 后端查询数据 -->
+<select id="listHou" resultMap="listMap">
+	select * from goods
+<!-- 查询条件 -->
+<include refid="WhereSQLHou"></include>
+<!-- 分页的数据 -->
+<if test="page.size !=null and page.page  !=null">
+	limit #{page.start},#{page.size}
+</if>
+</select>
+ 
+ 
+<select id="adminList" resultType="com.easy.bean.Admin">
+select name from admin where id=#{id}
+</select>
+<select id="categoryList" resultType="com.easy.bean.Category">
+select name from category where id=#{pid}
+</select>
+
+<resultMap type="com.easy.bean.Goods" id="listMap">
+<result column="id" property="id"/>
+<result column="adminid" property="adminid"/>
+<result column="editid" property="editid"/>
+<result column="pid" property="pid"/>
+ 
+<association column="adminid" property="initAdmin" select="adminList"></association>
+<association column="editid" property="editAdmin" select="adminList"></association>
+
+<association column="pid" property="category" select="categoryList"></association> 
+</resultMap>
+
+
+<!-- 总条数 -->
+<select id="count" resultType="int">
+	select count(*) from goods
+  <!-- 查询条件 -->
+  <include refid="WhereSQL"></include>
+
+</select>
+
+<!-- 总条数 -->
+<select id="countHou" resultType="int">
+	select count(*) from goods
+  <!-- 查询条件 -->
+  <include refid="WhereSQLHou"></include>
+
+</select>
+<!-- 删除数据 -->
+<update id="delete">
+update goods set del=1 where id= #{id}
+</update>
+
+<!-- 编辑数据 -->
+<update id="goodsEdit">
+update goods 
+<set>
+goods.edittime=now(),
+<if test="goods.code!=null">
+code=#{goods.code},
+</if>
+<if test="goods.name!=null">
+name=#{goods.name},
+</if>
+<if test="goods.edittime!=null">
+edittime=#{goods.edittime},
+</if>
+<if test="goods.info!=null">
+info=#{goods.info},
+</if>
+<if test="goods.oldprice!=null">
+oldprice=#{goods.oldprice},
+</if>
+<if test="goods.price!=null">
+price=#{goods.price},
+</if>
+editid=1
+
+</set>
+<where>
+<if test="goods.id!=null">
+id=#{goods.id}
+</if>
+
+
+</where>
+
+</update>
+
+<!-- 增加数据 -->
+<insert id="goodsAdd" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+
+insert into goods (code,name,adminid,jointime,info,oldprice,price,stock,pid,img) values(#{goods.code},#{goods.name},1,now(),#{goods.info},#{goods.oldprice},#{goods.price},#{goods.stock},#{goods.pid},#{goods.img})
+
+</insert>
+<!-- 订单改变库存 -->
+<update id="changeGoods">
+update goods set stock=#{stock}  where id=#{id}
+
+</update>
+
+<!-- 根据id查库存 -->
+<select id="byIdGoods" resultType="com.easy.bean.Goods">
+
+select * from goods where id=#{id}
+</select>
+
+<!-- 父级类别 -->
+<select id="parentList" resultType="com.easy.bean.Category">
+select * from category  where pid != 0
+</select>
+
+<select id="goodList" resultType="com.easy.bean.Goods">
+select * from goods
+</select>
+
+
+<!--商品上下架  -->
+
+<update id="shangXiaJia">
+	
+	update goods set state=#{state} where id=#{id}
+
+</update>
+
+
+<!-- 删除订单回滚 -->
+
+<update id="rollBack">
+update goods set stock=stock+#{stock} where id=#{id}
+</update>
+
+
+<!-- 购物车 -->
+<!-- <select id="carCount" resultType="int">
+
+select count(*) from shoppingcar where goodsid=#{car.goodsid} and userid=#{car.userid}
+
+</select>
+
+<update id="carEditCount" >
+update shoppingcar set num=num+1 where goodsid=#{car.goodsid} and userid=#{car.userid}
+
+</update>
+<insert id="addCar">
+insert into shoppingcar (goodsid,userid,jointime,num,goodsprice) values(#{car.goodsid},#{car.userid},now(),#{car.num},#{car.goodsprice})
+</insert> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

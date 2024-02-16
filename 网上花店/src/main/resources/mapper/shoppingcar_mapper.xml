@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 对应接口的全名 -->
+<mapper namespace="com.easy.dao.IShoppingCarDao">
+<!-- 购物车 -->
+<select id="carCoun" resultType="int">
+
+select count(*) from shoppingcar where goodsid=#{car.goodsid} and userid=#{car.userid}
+
+</select>
+
+<update id="carEditCount" >
+update shoppingcar set num=num+1 where goodsid=#{car.goodsid} and userid=#{car.userid}
+
+</update>
+<insert id="addCar">
+insert into shoppingcar (goodsid,userid,jointime,num,goodsprice) values(#{car.goodsid},#{car.userid},now(),#{car.num},#{car.goodsprice})
+</insert>
+
+
+
+<!-- 查询购物车 -->
+<select id="car" resultMap="searchcar">
+select * from shoppingcar 
+</select>
+
+<select id="goodss" resultType="com.easy.bean.Goods">
+select  * from goods where id=#{goodsid}
+</select>
+
+<resultMap type="com.easy.bean.ShoppingCar" id="searchcar">
+<result column="goodsid" property="goodsid"/> 
+<!-- association用到的字段会被吃掉，所以要<result>映射处理 -->
+<association column="goodsid" property="goodsname" select="goodss"></association>
+ <association column="goodsid" property="goodsimg" select="goodss"></association> 
+</resultMap>
+
+
+
+<!-- 修改数据 -->
+<update id="editCount">
+update shoppingcar set num=#{car.num} where goodsid=#{car.goodsid}
+
+</update>
+
+<!-- 删除购物车 -->
+
+<delete id="deleteCar">
+delete from shoppingcar where goodsid=#{goodsid} and userid=#{userid}
+</delete>
+<!-- 订单显示 -->
+<select id="choose"  resultMap="choosecar">
+select * from shoppingcar  where `check`=1;
+
+</select>
+<resultMap type="com.easy.bean.ShoppingCar" id="choosecar">
+<result column="goodsid" property="goodsid"/> 
+<!-- association用到的字段会被吃掉，所以要<result>映射处理 -->
+
+ <association column="goodsid" property="goodsimg" select="goodss"></association> 
+</resultMap>
+
+
+
+
+</mapper>

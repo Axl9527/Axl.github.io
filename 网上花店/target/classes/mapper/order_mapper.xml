@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 对应接口的全名 -->
+<mapper namespace="com.easy.dao.IOrderDao">
+<sql id="WhereSQL">
+<where>
+del=0 
+<if test="order.uid!=null and order.uid!=''">
+	
+	and uid = #{order.uid}
+	</if>
+	
+</where>
+</sql>
+
+
+<select id="orderList" resultMap="order">
+select * from `order`
+	<!-- 查询条件 -->
+	<include refid="WhereSQL"></include>
+	<!-- 分页的数据 -->
+	<if test="page.size !=null and page.page !=null">
+		limit #{page.start},#{page.size}
+	</if>
+</select>
+
+<select id="usersList" resultType="com.easy.bean.User">
+	select * from user where uid=#{userid}
+</select>
+
+<resultMap type="com.easy.bean.Order2" id="order">
+<result property="uid" column="uid" />
+
+<association property="user" column="uid" select="usersList" ></association>
+
+
+
+</resultMap>
+
+
+
+<select id="orderCount" resultType="int">
+	select count(*) from `order`
+	<!-- 查询条件 -->
+	<include refid="WhereSQL"></include>
+</select>
+
+<select id="orderListL" resultType="com.easy.bean.Order2">
+select * from user
+</select>
+
+<!-- 用户搜索 -->
+<select id="parentList" resultType="com.easy.bean.User">
+select * from user  where del= 0
+</select>
+
+<!-- 收花人 -->
+
+<select id="address" resultType="com.easy.bean.Address">
+select id,userid,province,city,area,details ,def from address where userid=#{userid}
+</select>
+<!-- 增加地址 -->
+<insert id="add" useGeneratedKeys="true" keyColumn="id" keyProperty="id">  
+    insert into address (userid, province, city, area, details, def) values (#{userid}, #{province}, #{city}, #{area}, #{details}, #{def})  
+</insert>
+
+<insert id="addOrder" useGeneratedKeys="true" keyColumn="id" keyProperty="id">  
+    insert into `order` (code,uid,ordertime,oaddress) values (#{code}, #{uid},now(), #{oaddress})  
+</insert>
+
+<!-- 用户端查 -->
+<select id="checkList" resultType="com.easy.bean.OrderAll">
+
+select * from `order` <where>
+<if test="order.uid!=null and order.uid!=''">
+
+	and uid = #{order.uid}
+	</if>
+	 
+</where>
+ order by id desc
+
+</select>
+
+<select id="detailList"  resultType="com.easy.bean.Detail">
+select * from detail where orderid=#{orderid}
+</select>
+
+<resultMap type="com.easy.bean.Order2" id="detailMap">
+
+<result property="id" column="id"/>
+
+<collection property="list" column="id" select="detailList"></collection>
+</resultMap>
+
+<!-- 支付订单 -->
+
+<update id="editOrder">
+
+update `order`   set
+
+ 	state = #{state},
+            paytime = CASE WHEN state = 1 THEN now() ELSE paytime END,
+            paymoney = CASE WHEN state = 1 THEN #{paymoney} ELSE paymoney END,
+            deliverytime = CASE WHEN state = 2 THEN now() ELSE deliverytime END,
+            gettime = CASE WHEN state = 3 THEN now() ELSE gettime END
+        where id = #{id}
+
+
+</update>
+
+<!-- 删除订单 -->
+<delete id="delOrder">
+	delete from order where id=#{order.id}
+
+</delete>
+<!--    修改地址-->
+
+    <update id="editAddress">
+        update address set province=#{province},city=#{city},area=#{area},details=#{details},def=#{def}
+        <where> id=#{id} </where>
+    </update>
+<!-- 修改默认地址-->
+    <update id="defClear">
+        update address set def=0
+        <where> userid=#{userid} </where>
+    </update>
+
+<!-- 删除地址 -->
+	<delete id="delAddress">
+	
+	delete from address where id=#{id}
+	
+	</delete>
+
+</mapper>

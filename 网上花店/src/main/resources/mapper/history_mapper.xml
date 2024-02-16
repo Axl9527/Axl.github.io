@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 对应接口的全名 -->
+<mapper namespace="com.easy.dao.IHistoryDao">
+
+<insert id="addCollection">
+
+insert into zuji (gid,uid,jointime) values (#{gid},#{uid},now())
+</insert>
+
+<!-- 查看是否有重复 -->
+<select id="chongfu" resultType="int">
+
+select count(*) from zuji where gid=#{gid} and uid=#{uid}
+
+</select>
+
+<!-- 查看喜欢商品 -->
+<select id="list" resultMap="historyList">
+
+select * from zuji where uid=#{uid} order by jointime desc
+
+</select>
+<select id="goodLists" resultType="com.easy.bean.Goods">
+
+select * from goods where id=#{gid}
+
+</select>
+<resultMap type="com.easy.bean.Zuji" id="historyList">
+<result property="gid" column="gid"/>
+
+<association property="good" column="gid" select="goodLists"></association>
+
+</resultMap>
+
+
+<!-- 重新更新历史的商品数据 -->
+<update id="editHistory">
+
+update zuji set jointime=now() where gid=#{gid} and uid=#{uid}
+
+
+</update>
+<!-- 删除历史记录 -->
+
+<delete id="delHistory">
+delete from zuji where uid=#{uid} and gid=#{gid}
+
+</delete>
+
+</mapper>
